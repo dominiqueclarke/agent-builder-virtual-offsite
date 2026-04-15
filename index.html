@@ -2650,6 +2650,7 @@
   <button type="button" class="exp-tab-btn" data-tab="rule-authoring">Rule Authoring</button>
   <button type="button" class="exp-tab-btn" data-tab="rca-workflows">RCA &amp; Significant Events</button>
   <button type="button" class="exp-tab-btn" data-tab="productionizing">Productionizing</button>
+  <button type="button" class="exp-tab-btn" data-tab="stakeholders">Stakeholders</button>
 </div>
 
 <div class="exp-tab-content">
@@ -3921,6 +3922,690 @@
 
   </div>
   <div class="exp-tab-panel" id="tab-rca-workflows">
+
+    <h2 style="font-size:22px;font-weight:700;margin-bottom:4px">RCA Workflows &amp; Significant Events</h2>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:28px">
+      These are two distinct explorations that share a common theme: leveraging alerting v2 primitives to surface deeper insights from alert data.
+    </p>
+
+    <!-- RCA Workflows -->
+    <div style="border:1px solid var(--border-light);border-radius:8px;padding:24px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:36px;height:36px;border-radius:8px;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128279;</div>
+        <h3 style="font-size:18px;font-weight:700;margin:0">RCA Workflows</h3>
+        <span style="font-size:11px;font-weight:600;color:#1E40AF;background:#DBEAFE;padding:2px 8px;border-radius:10px">Workflows Demo</span>
+      </div>
+
+      <div style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px">
+        In the short term, RCA exploration could be framed as an <strong style="color:var(--text)">overall workflows demo</strong>.
+        One of the key benefits of v2 and notification policies is that they allow users to essentially
+        <strong style="color:var(--text)">create their own custom RCA workflows</strong>. The building blocks are already there:
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="border:1px solid var(--border-light);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">&#128220;</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Notification Policies</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Route, enrich, and chain alerts into multi-step workflows</div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">&#129302;</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Agent Builder Integration</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Conversational investigation and automated triage at each step</div>
+        </div>
+        <div style="border:1px solid var(--border-light);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">&#128256;</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Episode Lifecycle</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Track state across the full alert lifecycle from fire to resolve</div>
+        </div>
+      </div>
+
+      <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:14px 18px;font-size:13px;color:#0C4A6E;line-height:1.6;margin-bottom:24px">
+        <strong>Note:</strong> This is similar to what Tal demoed with v1 rules by polling &mdash; but v2&rsquo;s notification policies and episode model make these workflows first-class rather than ad-hoc. The demo should showcase how a user strings together rules, policies, and agent actions into a coherent RCA pipeline.
+      </div>
+
+      <!-- Example Workflow -->
+      <div style="margin-bottom:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:var(--text)">Example: Investigation &amp; Correlation Workflow</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">A real workflow created by another engineer to demonstrate AI agent + workflow-driven RCA</div>
+          </div>
+          <button type="button" id="rca-yaml-toggle-btn" onclick="var y=document.getElementById('rca-yaml-block'),v=document.getElementById('rca-visual-block'),b=this;if(y.style.display==='none'){y.style.display='block';v.style.display='none';b.textContent='View Pipeline'}else{y.style.display='none';v.style.display='block';b.textContent='View YAML Source'}" style="font-size:12px;font-weight:600;color:var(--primary);background:none;border:1px solid var(--primary);border-radius:6px;padding:4px 12px;cursor:pointer">View YAML Source</button>
+        </div>
+
+        <!-- Pipeline visualization -->
+        <div id="rca-visual-block">
+        <div style="display:flex;gap:0;align-items:stretch;margin-bottom:16px;overflow-x:auto;padding-bottom:8px">
+          <div style="min-width:140px;flex:1;border:1px solid #BFDBFE;border-radius:8px 0 0 8px;padding:14px 12px;background:#EFF6FF;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#9889;</div>
+            <div style="font-size:11px;font-weight:700;color:#1E40AF;margin-bottom:4px">TRIGGER</div>
+            <div style="font-size:11px;color:#1E40AF">Alert fires</div>
+          </div>
+          <div style="width:2px;background:#BFDBFE;flex-shrink:0"></div>
+          <div style="min-width:140px;flex:1;border-top:1px solid #BFDBFE;border-bottom:1px solid #BFDBFE;padding:14px 12px;background:#F8FAFF;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#129302;</div>
+            <div style="font-size:11px;font-weight:700;color:#1E40AF;margin-bottom:4px">STEP 1</div>
+            <div style="font-size:11px;color:#374151">Agent: Root Cause Prompt</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px"><code style="font-size:10px">agent_builder/converse</code></div>
+          </div>
+          <div style="width:2px;background:#BFDBFE;flex-shrink:0"></div>
+          <div style="min-width:140px;flex:1;border-top:1px solid #BFDBFE;border-bottom:1px solid #BFDBFE;padding:14px 12px;background:#F8FAFF;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#128269;</div>
+            <div style="font-size:11px;font-weight:700;color:#1E40AF;margin-bottom:4px">STEP 2</div>
+            <div style="font-size:11px;color:#374151">ES: Get Active Alerts</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px"><code style="font-size:10px">.alerts-observability.*</code></div>
+          </div>
+          <div style="width:2px;background:#BFDBFE;flex-shrink:0"></div>
+          <div style="min-width:140px;flex:1;border-top:1px solid #BFDBFE;border-bottom:1px solid #BFDBFE;padding:14px 12px;background:#F8FAFF;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#129302;</div>
+            <div style="font-size:11px;font-weight:700;color:#1E40AF;margin-bottom:4px">STEP 3</div>
+            <div style="font-size:11px;color:#374151">Agent: Continue Investigation</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px">Logs, patterns, correlations</div>
+          </div>
+          <div style="width:2px;background:#BFDBFE;flex-shrink:0"></div>
+          <div style="min-width:140px;flex:1;border-top:1px solid #BFDBFE;border-bottom:1px solid #BFDBFE;padding:14px 12px;background:#F8FAFF;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#129520;</div>
+            <div style="font-size:11px;font-weight:700;color:#1E40AF;margin-bottom:4px">STEP 4</div>
+            <div style="font-size:11px;color:#374151">AI: Correlate Alerts</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px">Structured output w/ schema</div>
+          </div>
+          <div style="width:2px;background:#BFDBFE;flex-shrink:0"></div>
+          <div style="min-width:140px;flex:1;border-top:1px solid #BFDBFE;border-bottom:1px solid #BFDBFE;padding:14px 12px;background:#F8FAFF;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#128200;</div>
+            <div style="font-size:11px;font-weight:700;color:#1E40AF;margin-bottom:4px">STEP 5</div>
+            <div style="font-size:11px;color:#374151">AI: Determine Severity</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px">critical / high / med / low</div>
+          </div>
+          <div style="width:2px;background:#BFDBFE;flex-shrink:0"></div>
+          <div style="min-width:140px;flex:1;border:1px solid #BBF7D0;border-radius:0 8px 8px 0;padding:14px 12px;background:#F0FDF4;text-align:center">
+            <div style="font-size:18px;margin-bottom:6px">&#128188;</div>
+            <div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:4px">OUTPUT</div>
+            <div style="font-size:11px;color:#166534">Case + Correlated Alerts</div>
+          </div>
+        </div>
+
+        <!-- Step details (expandable) -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div style="border:1px solid var(--border-light);border-radius:8px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">&#129302; Agent: Root Cause Analysis</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+              Sends the triggering alert to <code>agent_builder/converse</code> with the prompt: <em>&ldquo;Investigate the following alerts and provide possible root causes.&rdquo;</em>
+              The agent uses its full tool set to query data, analyze patterns, and produce an initial hypothesis.
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:8px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">&#128269; ES: Active Alert Correlation</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+              Queries <code>.alerts-observability.*</code> for all active alerts in the last 24h across APM, infra, logs, SLOs, and uptime.
+              Returns up to 100 alerts with rule info, reason, service name, and timestamps.
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:8px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">&#129302; Agent: Continued Investigation</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+              Continues the same conversation &mdash; queries related logs (&#177;15 min), identifies error patterns and spikes, checks correlations across log sources, and assesses impact scope.
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:8px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">&#129520; AI: Structured Correlation</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+              An <code>ai.prompt</code> step with a strict <code>outputSchema</code> &mdash; produces <code>correlation_summary</code>, <code>root_cause_hypothesis</code>, and an array of <code>related_alerts</code> with UUIDs and reasons. Uses structured output, not free text.
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:8px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">&#128200; AI: Severity Determination</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+              Another <code>ai.prompt</code> with <code>outputSchema</code> &mdash; classifies severity as critical/high/medium/low based on impact scope, affected services, and potential business consequences. Includes reasoning.
+            </div>
+          </div>
+          <div style="border:1px solid var(--border-light);border-radius:8px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:6px">&#128188; Output: Auto-Created Case</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+              Creates a Kibana case with AI-generated title and description, attaches the triggering alert and all correlated alerts via <code>foreach</code>, adds the full correlation analysis and investigation transcript as comments.
+            </div>
+          </div>
+        </div>
+
+        <!-- Key workflow types -->
+        <div style="background:#F8FAFF;border:1px solid #DBEAFE;border-radius:8px;padding:14px 18px;font-size:13px;color:#1E3A5F;line-height:1.6;margin-bottom:16px">
+          <strong>Key step types used:</strong>
+          <span style="display:inline-block;background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:2px 4px">kibana.request</span>
+          <span style="display:inline-block;background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:2px 4px">elasticsearch.request</span>
+          <span style="display:inline-block;background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:2px 4px">ai.prompt</span>
+          <span style="display:inline-block;background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:2px 4px">data.set</span>
+          <span style="display:inline-block;background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:2px 4px">foreach</span>
+          <span style="display:inline-block;background:#DBEAFE;color:#1E40AF;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin:2px 4px">kibana.createCaseDefaultSpace</span>
+          &mdash; users can compose these primitives into any RCA pipeline they need.
+        </div>
+
+        </div><!-- /rca-visual-block -->
+
+        <!-- YAML source (hidden by default, replaces visual) -->
+        <div id="rca-yaml-block" style="display:none">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Workflow YAML Source</div>
+          <pre style="background:#1E293B;color:#E2E8F0;border-radius:8px;padding:16px 20px;font-size:11px;line-height:1.6;overflow-x:auto;max-height:600px;overflow-y:auto;margin:0"><code>version: "1"
+name: &#129302; Investigation and correlation
+description: an example to demonstrate the application of AI agents
+  and workflows to enable root cause analysis in observability.
+enabled: true
+tags:
+  - RCA
+  - DEMO
+consts:
+  agentId: elastic-ai-agent
+  basePath: gcm/
+triggers:
+  - type: alert
+steps:
+  - name: promptForRootCause
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/agent_builder/converse"
+      body:
+        agent_id: "{{consts.agentId}}"
+        input: |
+          Investigate the following alerts: {{ event | json }} and provide possible root causes.
+          To not blow up your context window please keep your analysis and data exploration brief.
+
+          You may use emojis in your response.
+    timeout: 10m
+    on-failure:
+      retry:
+        max-attempts: 3
+  - name: setConversationId
+    type: data.set
+    with:
+      conversationId: "{{ steps.promptForRootCause.output.conversation_id }}"
+  - name: getActiveAlerts
+    type: elasticsearch.request
+    with:
+      method: POST
+      path: /.alerts-observability.*/_search
+      body:
+        size: 100
+        sort:
+          - "@timestamp":
+              order: desc
+        query:
+          bool:
+            filter:
+              - term:
+                  kibana.alert.status: active
+              - range:
+                  "@timestamp":
+                    gte: now-24h
+              - terms:
+                  kibana.alert.rule.consumer:
+                    - apm
+                    - infrastructure
+                    - logs
+                    - observability
+                    - slo
+                    - uptime
+        _source:
+          includes:
+            - kibana.alert.uuid
+            - kibana.alert.rule.*
+            - kibana.alert.reason
+            - kibana.alert.start
+            - kibana.alert.status
+            - service.name
+            - service.environment
+            - "@timestamp"
+  - name: continueInvestigation
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/agent_builder/converse"
+      body:
+        agent_id: "{{consts.agentId}}"
+        conversation_id: "{{variables.conversationId}}"
+        input: |
+          Continue your investigation by:
+
+          1. **Query related logs**: Search for logs from the affected service(s)
+             in the time window around the alert (&#177;15 minutes)
+          2. **Look for patterns**: Identify any error patterns, spikes, or anomalies
+          3. **Check correlations**: Look for related events across different log sources
+          4. **Assess impact**: Determine if the issue is isolated or widespread
+
+          Note: logs-*, metrics-*, traces-* are the relevant indices
+
+          Focus on actionable insights that could help identify the root cause.
+          Keep your analysis concise.
+
+          Use emojis to highlight key findings:
+          &#128308; for critical issues, &#9888;&#65039; for warnings, &#9989; for normal behavior.
+  - name: correlateAlerts
+    type: ai.prompt
+    with:
+      connectorId: ab
+      prompt: |
+        You are analyzing an incident. Here's what we know:
+
+        **Triggering Alert:**
+        {{ event | json }}
+
+        **Root Cause Analysis:**
+        {{ steps.promptForRootCause.output.response.message }}
+
+        **Continued Investigation:**
+        {{ steps.continueInvestigation.output.response.message }}
+
+        **All Currently Active Alerts ({{ steps.getActiveAlerts.output.hits.total.value }} total):**
+        {{ steps.getActiveAlerts.output.hits.hits | json }}
+
+        Analyze these alerts and identify which ones are related to the same root cause
+        as the triggering alert.
+
+        Look for:
+        - **Same environment** ({{ event.service.environment | default: "any" }})
+        - **Same time window** (alerts that started around the same time)
+        - **Related services** (services that depend on each other or share infrastructure)
+        - **Similar symptoms** (same error patterns, similar failure rates)
+        - **Cascading failures** (one service failure causing others)
+
+        For each related alert, explain WHY it's related and how it connects to the root cause.
+        Return structured data with alert details needed to attach them to the case.
+      outputSchema:
+        type: object
+        properties:
+          correlation_summary:
+            type: string
+            description: "Overall summary of how the alerts are related"
+          root_cause_hypothesis:
+            type: string
+            description: "Updated root cause hypothesis based on all alerts"
+          related_alerts:
+            type: array
+            items:
+              type: object
+              properties:
+                alert_uuid:
+                  type: string
+                  description: "The kibana.alert.uuid"
+                alert_index:
+                  type: string
+                  description: "The _index field"
+                rule_uuid:
+                  type: string
+                  description: "The kibana.alert.rule.uuid"
+                rule_name:
+                  type: string
+                  description: "The kibana.alert.rule.name"
+                service_name:
+                  type: string
+                  description: "The service.name if available"
+                correlation_reason:
+                  type: string
+                  description: "Why this alert is related to the incident"
+              required:
+                - alert_uuid
+                - alert_index
+                - rule_uuid
+                - rule_name
+                - correlation_reason
+          unrelated_alert_count:
+            type: number
+            description: "Number of alerts that are NOT related"
+        required:
+          - correlation_summary
+          - root_cause_hypothesis
+          - related_alerts
+          - unrelated_alert_count
+    timeout: 5m
+  - name: generateCaseDetails
+    type: ai.prompt
+    with:
+      connectorId: ab
+      prompt: |
+        Based on the output from the conversation:
+        {{ steps.promptForRootCause.output | json }}, we are going to create a case.
+        Please provide:
+        1. A case title that is clear and informative
+        2. A case description that is clear and informative
+
+        Return your response in the following format with these exact fields.
+      outputSchema:
+        type: object
+        properties:
+          title:
+            type: string
+            description: "Clear and informative case title"
+          description:
+            type: string
+            description: "Clear and informative case description"
+        required:
+          - title
+          - description
+    timeout: 10m
+    on-failure:
+      retry:
+        max-attempts: 3
+  - name: determineSeverity
+    type: ai.prompt
+    with:
+      connectorId: ab
+      prompt: |
+        Based on the investigation findings:
+
+        **Initial Alert:** {{ event | json }}
+        **Root Cause Analysis:** {{ steps.promptForRootCause.output.response.message }}
+        **Continued Investigation:** {{ steps.continueInvestigation.output.response.message }}
+
+        Determine the appropriate case severity based on:
+        - **critical**: Service is down, data loss, security breach, or multiple services affected
+        - **high**: Significant performance degradation, multiple users affected, or repeated failures
+        - **medium**: Intermittent issues, limited user impact, or isolated failures
+        - **low**: Minor issues, no user impact, or informational alerts
+
+        Consider the scope of impact, number of affected services/alerts,
+        and potential business consequences.
+      outputSchema:
+        type: object
+        properties:
+          severity:
+            type: string
+            enum: ["low", "medium", "high", "critical"]
+            description: "The determined severity level"
+          reasoning:
+            type: string
+            description: "Brief explanation for the severity determination"
+        required:
+          - severity
+          - reasoning
+    timeout: 5m
+    on-failure:
+      retry:
+        max-attempts: 3
+  - name: createCase
+    type: kibana.createCaseDefaultSpace
+    with:
+      connector:
+        fields: null
+        id: none
+        name: none
+        type: .none
+      description: "{{ steps.generateCaseDetails.output.content.description }}"
+      owner: observability
+      settings:
+        syncAlerts: false
+      severity: "${{ steps.determineSeverity.output.content.severity }}"
+      tags:
+        - Example
+      title: "{{ steps.generateCaseDetails.output.content.title }}"
+    on-failure:
+      retry:
+        max-attempts: 3
+  - name: setCaseId
+    type: data.set
+    with:
+      caseId: "{{ steps.createCase.output.id }}"
+  - name: setContextOnCaseId
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/agent_builder/converse"
+      body:
+        agent_id: "{{consts.agentId}}"
+        conversation_id: "{{variables.conversationId}}"
+        input: "FYI, the created case ID is: {{variables.caseId}}.
+          No action is required, just update your context."
+  - name: addAlert
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/cases/{{ variables.caseId }}/comments"
+      body:
+        type: alert
+        owner: observability
+        alertId: "{{event.alerts[0]._id}}"
+        index: "{{event.alerts[0]._index}}"
+        rule:
+          id: "{{event.rule.id}}"
+          name: "{{event.rule.name}}"
+    on-failure:
+      retry:
+        max-attempts: 3
+  - name: addCorrelatedAlerts
+    type: foreach
+    foreach: "{{ steps.correlateAlerts.output.content.related_alerts }}"
+    steps:
+      - name: addRelatedAlert
+        type: kibana.request
+        with:
+          method: "POST"
+          path: "/api/cases/{{ variables.caseId }}/comments"
+          body:
+            type: alert
+            owner: observability
+            alertId: "{{ foreach.item.alert_uuid }}"
+            index: "{{ foreach.item.alert_index }}"
+            rule:
+              id: "{{ foreach.item.rule_uuid }}"
+              name: "{{ foreach.item.rule_name }}"
+        on-failure:
+          continue: true
+    on-failure:
+      continue: true
+  - name: addCorrelationAnalysis
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/cases/{{ variables.caseId }}/comments"
+      body:
+        type: user
+        owner: observability
+        comment: |
+          ## &#128279; Alert Correlation Analysis
+
+          **Total Active Alerts Analyzed:**
+            {{ steps.getActiveAlerts.output.hits.total.value }}
+          **Related Alerts Found:**
+            {{ steps.correlateAlerts.output.content.related_alerts.size }}
+          **Unrelated Alerts:**
+            {{ steps.correlateAlerts.output.content.unrelated_alert_count }}
+
+          ---
+          ### &#128202; Correlation Summary
+          {{ steps.correlateAlerts.output.content.correlation_summary }}
+
+          ---
+          ### &#127919; Root Cause Hypothesis
+          {{ steps.correlateAlerts.output.content.root_cause_hypothesis }}
+
+          ---
+          ### &#128269; Related Alerts Details
+          {%- for alert in steps.correlateAlerts.output.content.related_alerts %}
+          **{{ forloop.index }}. {{ alert.rule_name }}**
+          {%- if alert.service_name %}
+          - **Service:** {{ alert.service_name }}
+          {%- endif %}
+          - **Alert ID:** `{{ alert.alert_uuid }}`
+          - **Why Related:** {{ alert.correlation_reason }}
+          {%- endfor %}
+  - name: getConversation
+    type: kibana.request
+    with:
+      method: "GET"
+      path: "/api/agent_builder/conversations/{{ variables.conversationId }}"
+  - name: addReasoningToCase
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/cases/{{ variables.caseId }}/comments"
+      body:
+        type: user
+        owner: observability
+        comment: |
+          ## &#128269; AI Investigation Summary
+
+          [View Full Conversation]({{ context.kibanaUrl }}/{{consts.basePath}}
+            app/agent_builder/conversations/{{ variables.conversationId }})
+
+          ### Investigation Steps
+          {%- assign step_number = 0 %}
+          {%- for round in steps.getConversation.output.rounds %}
+          {%- for step in round.steps %}
+          {%- if step.type == "reasoning" %}
+          {%- assign step_number = step_number | plus: 1 %}
+          **{{ step_number }}. Reasoning**
+          &gt; {{ step.reasoning }}
+          {%- elsif step.type == "tool_call" %}
+          {%- assign query_esql = "" %}
+          {%- assign result_count = 0 %}
+          {%- assign has_error = false %}
+          {%- assign error_message = "" %}
+          {%- for result in step.results %}
+          {%- if result.type == "error" %}
+          {%- assign has_error = true %}
+          {%- assign error_message = result.data.message %}
+          {%- elsif result.type == "query" %}
+          {%- assign query_esql = result.data.esql %}
+          {%- elsif result.type == "tabular_data" %}
+          {%- assign result_count = result.data.values | size %}
+          {%- endif %}
+          {%- endfor %}
+          **Action:** `{{ step.tool_id }}`
+          {%- if has_error %}
+          - &#10060; **Error:** {{ error_message }}
+          {%- elsif query_esql != "" %}
+          - &#9989; **Found {{ result_count }} results**
+            &#8594; [View in Discover]({{ context.kibanaUrl }}/{{consts.basePath}}
+              app/discover#/?_a=(dataSource:(type:esql),
+              query:(esql:'{{ query_esql | url_encode }}')))
+          {%- else %}
+          - &#9989; **Completed**
+          {%- endif %}
+          {%- endif %}
+          {%- endfor %}
+          {%- endfor %}
+
+          ---
+          ### &#128221; Final Analysis
+          {{ steps.promptForRootCause.output.response.message }}
+    on-failure:
+      retry:
+        max-attempts: 2
+  - name: addRootCauseToCase
+    type: kibana.request
+    with:
+      method: "POST"
+      path: "/api/cases/{{ variables.caseId }}/comments"
+      body:
+        type: user
+        owner: observability
+        comment: |
+          ### &#128202; Case Severity:
+            {{ steps.determineSeverity.output.content.severity | upcase }}
+
+          **Reasoning:**
+            {{ steps.determineSeverity.output.content.reasoning }}</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Significant Events -->
+    <div style="border:1px solid var(--border-light);border-radius:8px;padding:24px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:36px;height:36px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9889;</div>
+        <h3 style="font-size:18px;font-weight:700;margin:0">Significant Events</h3>
+        <span style="font-size:11px;font-weight:600;color:#92400E;background:#FEF3C7;padding:2px 8px;border-radius:10px">Streams Integration</span>
+      </div>
+
+      <div style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px">
+        The exploration here is straightforward: <strong style="color:var(--text)">plug our alerting rules into the existing significant events &ldquo;discovery&rdquo; feature</strong> and see what happens. Streams already has
+        a discovery mechanism for identifying significant events from signal data &mdash; we want to see how our ES|QL alert rules integrate with that pipeline.
+      </div>
+
+      <div style="display:flex;gap:16px;align-items:stretch">
+        <div style="flex:1;border:1px solid var(--border-light);border-radius:8px;padding:20px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">What we provide</div>
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.7">
+            <div style="display:flex;gap:8px;margin-bottom:4px"><span style="color:var(--primary)">&#10003;</span> ES|QL alert rules that produce signals</div>
+            <div style="display:flex;gap:8px;margin-bottom:4px"><span style="color:var(--primary)">&#10003;</span> Rule metadata (thresholds, data sources, tags)</div>
+            <div style="display:flex;gap:8px"><span style="color:var(--primary)">&#10003;</span> Episode context and lifecycle events</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;font-size:24px;color:var(--text-secondary);flex-shrink:0">&#10132;</div>
+        <div style="flex:1;border:1px solid var(--border-light);border-radius:8px;padding:20px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">What Streams discovers</div>
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.7">
+            <div style="display:flex;gap:8px;margin-bottom:4px"><span style="color:#D97706">&#9733;</span> Cross-signal correlations</div>
+            <div style="display:flex;gap:8px;margin-bottom:4px"><span style="color:#D97706">&#9733;</span> Anomalous patterns across rules</div>
+            <div style="display:flex;gap:8px"><span style="color:#D97706">&#9733;</span> Significant events surfaced from alert data</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:14px 18px;font-size:13px;color:#78350F;line-height:1.6;margin-top:20px">
+        <strong>Experiment goal:</strong> Feed v2 alert rules into the Streams significant events discovery pipeline and evaluate whether the output is meaningful &mdash; do the discovered events align with real incidents? Does combining multiple rule signals surface patterns that individual rules miss?
+      </div>
+    </div>
+
+  </div>
+
+  <div class="exp-tab-panel" id="tab-stakeholders">
+    <h2 style="font-size:22px;font-weight:700;margin-bottom:4px">Stakeholders</h2>
+    <p style="color:var(--text-secondary);font-size:14px;margin-bottom:28px">
+      Key stakeholders and their roles in the alerting v2 and agent builder ecosystem.
+    </p>
+
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border-light);text-align:left">
+          <th style="padding:10px 12px;font-weight:600;color:var(--text);white-space:nowrap">Slack Channel</th>
+          <th style="padding:10px 12px;font-weight:600;color:var(--text)">Focus Area</th>
+          <th style="padding:10px 12px;font-weight:600;color:var(--text)">Collaboration Topics</th>
+        </tr>
+      </thead>
+      <tbody id="stakeholders-tbody">
+        <tr style="border-bottom:1px solid var(--border-light)">
+          <td style="padding:12px;white-space:nowrap">
+            <span style="background:#4A154B;color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;font-family:monospace">#streams</span>
+          </td>
+          <td style="padding:12px;color:var(--text)">Data Onboarding</td>
+          <td style="padding:12px;color:var(--text-secondary);line-height:1.6">Simplifying rule v2 onboarding for streams</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light)">
+          <td style="padding:12px;white-space:nowrap">
+            <span style="background:#4A154B;color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;font-family:monospace">#obs-integrations</span>
+          </td>
+          <td style="padding:12px;color:var(--text)">Data Onboarding</td>
+          <td style="padding:12px;color:var(--text-secondary);line-height:1.6">Simplifying rule v2 onboarding for integrations, content packs</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light)">
+          <td style="padding:12px;white-space:nowrap">
+            <span style="background:#4A154B;color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;font-family:monospace">#significant-events-dev</span>
+          </td>
+          <td style="padding:12px;color:var(--text)">Significant Events</td>
+          <td style="padding:12px;color:var(--text-secondary);line-height:1.6">Integrations with significant events discovery</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light)">
+          <td style="padding:12px;white-space:nowrap">
+            <span style="background:#4A154B;color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;font-family:monospace">#agentic-interface</span>
+          </td>
+          <td style="padding:12px;color:var(--text)">External UX</td>
+          <td style="padding:12px;color:var(--text-secondary);line-height:1.6">API and UX compatibility with 3rd party agentic tools (Cursor, Claude, etc.). Also responsible for <a href="https://github.com/elastic/agent-skills" target="_blank" style="color:var(--primary)">elastic/agent-skills</a></td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light)">
+          <td style="padding:12px;white-space:nowrap">
+            <span style="background:#4A154B;color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;font-family:monospace">#beacon-developers</span>
+          </td>
+          <td style="padding:12px;color:var(--text)">Internal SREs</td>
+          <td style="padding:12px;color:var(--text-secondary);line-height:1.6">Internal SREs making heavy use of agents; helpful for user research, sourcing ideas, and validation</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border-light)">
+          <td style="padding:12px;white-space:nowrap">
+            <span style="background:#4A154B;color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;font-family:monospace">#obs-agent-ideas</span>
+          </td>
+          <td style="padding:12px;color:var(--text)">Agent Builder Strategy</td>
+          <td style="padding:12px;color:var(--text-secondary);line-height:1.6">Senior folks exploring obs-focused agent builder enhancements and ideas</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="exp-tab-panel" id="tab-productionizing">
